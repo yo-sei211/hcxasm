@@ -1,18 +1,29 @@
-name: Docker Image CI
+name: Docker build test
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: push
 
 jobs:
-
-  build:
-
+  docker-build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Source checkout
+      uses: actions/checkout@v4
+    - name: Set up docker buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Build docker image
+      run: docker build -t built-image .
+
++   - name: Export docker image
+
++     run: docker save -o built-image.tar built-image
+
++   - name: Save image as artifact
+
++     uses: actions/upload-artifact@v4
+
++     with:
+
++       name: built-image.tar
+
++       path: built-image.tar
