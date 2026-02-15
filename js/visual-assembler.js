@@ -701,10 +701,21 @@ function makeMacroblock_regreg(type, label, color) {
   ];
   Blockly.Blocks[type] = {
   init: function() {
-    this.appendDummyInput()
-        .appendField(label)
-        .appendField(new Blockly.FieldDropdown(REG), "DST")
-        .appendField(new Blockly.FieldDropdown(REG), "SRC");
+    var input = this.appendDummyInput();
+    input.appendField(label);
+
+    if (type === 'm_mov') {
+      input
+          .appendField('する')
+          .appendField(new Blockly.FieldDropdown(REG), "DST")
+          .appendField('に')
+          .appendField(new Blockly.FieldDropdown(REG), "SRC")
+          .appendField('を');
+    } else {
+      input
+          .appendField(new Blockly.FieldDropdown(REG), "DST")
+          .appendField(new Blockly.FieldDropdown(REG), "SRC");
+    }
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(color);
