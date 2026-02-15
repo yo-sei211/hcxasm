@@ -24,7 +24,7 @@ function makeImmBlock(type, label, color) {
     init: function() {
       this.appendDummyInput()
           .appendField(label + ' #')
-          .appendField(new Blockly.FieldNumber(0, 0, 255), "VALUE");
+          .appendField(new Blockly.FieldTextInput("0"), "VALUE"); //文字入力
       this.setPreviousStatement(true, null);
       this.setNextStatement(true, null);
       this.setColour(color);
