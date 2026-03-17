@@ -7,20 +7,10 @@
     -->
     <meta charset="utf-8">
     <title>HCx Series Visual Assembler</title>
-    <!-- Blockly本体の読み込み（オンライン版） -->
-    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <!-- ビジュアルアセンブラのスタイル -->
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
-    <div style="margin-bottom: 10px; margin-top: 10px; display:flex; gap:12px; align-items:center;">
-      <label>Architecture:</label>
-      <select id="archSelect">
-        <option value="HC4">HC4</option>
-        <option value="HC4E">HC4E</option>
-      </select>
-      <button id="saveButton" onclick="saveAssemblyFile()">アセンブリファイルを保存</button>
-    </div>
     <!-- Blocklyエディタを置く場所 -->
     <div id="blocklyContainer">
       <div id="toolboxSidebar">
@@ -30,6 +20,9 @@
       </div>
       <div id="blocklyDiv"></div>
     </div>
+    
+    <div id="outputSplitter" class="horizontal-resizer"></div>
+    
     <!-- 出力結果表示エリア（タブ構造） -->
     <div id="outputContainer">
       <div class="tab-header">
@@ -51,6 +44,18 @@
             <span id="registerStatus" style="color:#666;"></span>
           </div>
           <div id="registerOutput">レジスタの内容がここに表示されます...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新規ワークスペース確認ダイアログ -->
+    <div id="newWorkspaceDialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9999;">
+      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 5px; min-width: 300px;">
+        <h4>新しいワークスペース</h4>
+        <p>現在の作業内容が失われます。新しいワークスペースを作成しますか？</p>
+        <div style="text-align: right; margin-top: 15px;">
+          <button onclick="cancelNewWorkspace()" style="margin-right: 10px;">キャンセル</button>
+          <button onclick="confirmNewWorkspace()">OK</button>
         </div>
       </div>
     </div>
@@ -86,26 +91,37 @@
         if (activePane) activePane.classList.add('active');
       }
 
-      // アーキテクチャ切替
-      document.addEventListener('DOMContentLoaded', function() {
-        const sel = document.getElementById('archSelect');
-        if (sel) {
-          sel.value = (window.architecture || 'HC4');
-          sel.addEventListener('change', function() {
-            window.architecture = sel.value;
-            // 再初期化でツールボックスとジェネレータを更新
-            if (typeof initializeApp === 'function') {
-              initializeApp();
-            }
-          });
-        }
-      });
     </script>
 
-    <!-- ビジュアルアセンブラ本体コード -->
-    <script src="js/visual-assembler.js"></script>
-    <!-- UI機能 -->
-    <script src="js/ui-functions.js"></script>
+    <script>
+      (function() {
+        const params = new URLSearchParams(window.location.search);
+        const blocklySrc = params.get('blocklySrc') || 'https://unpkg.com/blockly/blockly.min.js';
+
+        function loadScript(src) {
+          return new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error(`Failed to load: ${src}`));
+            document.body.appendChild(s);
+          });
+        }
+
+        (async () => {
+          try {
+            await loadScript(blocklySrc);
+            await loadScript('js/visual-assembler.js');
+            await loadScript('js/ui-functions.js');
+          } catch (e) {
+            console.error(e);
+            const msg = document.getElementById('messageOutput');
+            if (msg) {
+              msg.textContent = `初期化エラー: ${e.message}`;
+            }
+          }
+        })();
+      })();
+    </script>
   </body>
-</html>
 </html>

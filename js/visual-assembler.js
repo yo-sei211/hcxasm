@@ -812,6 +812,7 @@ function initializeBlocks() {
   makeMacroblock_regregimm('m_addi', 'ADDI', 205);
   makeMacroblock_regreg('m_mov', 'MOV', 210);
   makeMacroblock_regimm('m_movi', 'MOVI', 215);
+  makeNoArgBlock('m_hlt', 'HLT', 220);
 }
 
 // --- コード生成ルール（独自アセンブリ出力） ---
@@ -939,6 +940,10 @@ function initializeCodeGenerator() {
     var imm = block.getFieldValue('IMM');
     return 'MOVI ' + dst + ' #' + imm + '\n';
   }
+
+  Blockly.Assembly.forBlock['m_hlt'] = function(block) {
+    return 'HALT\n';
+  }
   
   Blockly.Assembly.init = function(workspace) {};
   Blockly.Assembly.finish = function(code) { return code; };
@@ -996,7 +1001,8 @@ function getToolboxConfig() {
     { "kind": "block", "type": "m_add" },
     { "kind": "block", "type": "m_addi" },
     { "kind": "block", "type": "m_mov" },
-    { "kind": "block", "type": "m_movi" }
+    { "kind": "block", "type": "m_movi" },
+    { "kind": "block", "type": "m_hlt" }
   ];
 
   return {
@@ -1047,6 +1053,15 @@ function initializeWorkspace() {
       pinch: true
     }
   });
+
+  // 動的スクリプト読み込み時でも描画サイズを確定させる
+  setTimeout(() => {
+    try {
+      Blockly.svgResize(workspace);
+    } catch (e) {
+      console.error('[ERROR] svgResize failed:', e);
+    }
+  }, 0);
 
   registerDuplicateChainMenu(workspace);
   registerToolboxSidebar(workspace);
