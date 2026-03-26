@@ -736,7 +736,7 @@ function makeMacroblock_regimm(type, label, color) {
     this.appendDummyInput()
         .appendField(label)
         .appendField(new Blockly.FieldDropdown(REG), "DST")
-        .appendField(new Blockly.FieldNumber(0, 0, 255), "IMM");
+        .appendField(new Blockly.FieldTextInput("0"), "IMM");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(color);
